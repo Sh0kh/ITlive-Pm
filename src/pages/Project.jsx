@@ -7,6 +7,31 @@ import { useParams } from 'react-router-dom';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { gql, useQuery } from '@apollo/client';
+
+const GET_TASK = gql`
+  query TaskCommon($ID: String!) {
+    TaskCommon(ProjectId: $ID) {
+      condition
+      tasks {
+        title
+        description
+        fileUrl
+        employeeProject {
+          id
+          employee {
+            id
+            name
+            surname
+            phoneNumber
+            role
+            avatarUrl
+          }
+        }
+      }
+    }
+  }
+`;
 function Project() {
 
     
@@ -198,6 +223,13 @@ function Project() {
     const postFoto = (event) =>{
         setSelectedFile(event.target.files[0]);
     }
+
+    const { data: Task } = useQuery(GET_TASK, {
+        variables: { ID },
+        skip: !ID,
+      });
+      
+      console.log(Task);
 
     return (
         <div className='Project'>
