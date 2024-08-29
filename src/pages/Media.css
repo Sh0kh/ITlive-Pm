@@ -7,6 +7,9 @@
      .MyProject{
         padding-right: 50px !important;
     }
+    .Workers__wrapper{
+        width: 100%;
+    }
 }
 @media(max-width:1240px){
      .MyProject{
@@ -43,6 +46,9 @@
  .MyProject__wrapper{
         grid-template-columns: repeat(2,1fr) !important;
     }
+    .Workers__wrapper{
+        grid-template-columns: repeat(2,1fr);
+    }
 }
 @media(max-width:950px){
     .MainLayout{
@@ -71,6 +77,10 @@
         margin: 0 auto;
         width: 300px;
     }
+    .Workers{
+        padding: 10px;
+    }
+
 }
 @media(max-width:700px){
    
@@ -110,10 +120,20 @@
     .Modal{
         width: 90%;
         /* margin: 0 auto; */
-        padding: 10px;
+        padding: 15px;
     }
     .DeleteModal{
         padding: 0px;
+    }
+    .workers__title__wrapper{
+        flex-direction: column;
+        gap: 20px;
+    }
+    .Workers__wrapper{
+        grid-template-columns: repeat(1,1fr);
+    }
+    .ProfileWrapper {
+        width: 100%;
     }
 }
 @media(max-width:500px){
@@ -132,6 +152,9 @@
     .PaymentTable table{
         width: 400px;
     }
+    .profileFoto{
+        left: 30%;
+    }
 }
 @media(max-width:450px){
    .MyProject__card{
@@ -140,6 +163,15 @@
     }
     .Modal__wrapper{
         flex-direction: column;
+    }
+}
+@media(max-width:425px){
+    .Project form{
+        flex-direction: column !important;
+        gap: 10px;
+    }
+    .Project form button{
+        width: 100%;
     }
 }
 @media(max-width:420px){

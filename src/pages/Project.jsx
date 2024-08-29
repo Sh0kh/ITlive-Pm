@@ -2,7 +2,41 @@ import React, { useState, useRef, useEffect } from 'react'
 import Programmer from '/images/PmProgrammer.svg'
 import Design from '/images/PmDesign.svg'
 import SearchEmpte from '/images/SearchEmpty.png'
+import { $axios } from '../utils';
+import { useParams } from 'react-router-dom';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function Project() {
+
+    
+  const showSuccessToast = () => {
+    toast.success('Yaratildi!', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
+
+
+  const showErrorToast = () => {
+    toast.error('Xato!', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
+
     const modalRef = useRef(null);
     const modalRef2 = useRef(null);
     const modalRef3 = useRef(null);
@@ -31,11 +65,6 @@ function Project() {
     const [isMessage, setMessage] = useState(false)
     const MessageActive = () => {
         setMessage(!isMessage)
-    }
-
-    const [isTeam, setTeam] = useState(false)
-    const TeamModal = () => {
-        setTeam(!isTeam)
     }
 
     const handleClickOutside = (e) => {
@@ -106,11 +135,75 @@ function Project() {
         setOpen(isOpen === e ? null : e);
     };
 
+
+
+    // Get project 
+    const {ID} = useParams()
+    const [ProjectName, setProjectName] = useState([])
+    const GetProject  = ()=>{
+        $axios.get(`/project/getById/${ID}`,{
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+        })
+        .then((response)=>{
+            setProjectName(response.data)
+        })
+        .catch((error)=>{
+            console.log(error);
+        })
+    }
+    useEffect(()=>{
+        GetProject()
+    },[])
+
+
+
+    const [title, setTitle] = useState('')
+    const [description, setDescription] = useState('')
+    const [employee, setEmployee] = useState('')
+    const [selectedFile, setSelectedFile] = useState(null)
+
+    const CreateTask = ()=>{
+        e.preventDefault()
+        const NewData = {
+            title:title,
+            description:description,
+            employee:employee
+        }
+        const formData = new FormData();
+        for (let key of Object.keys(NewData)) {
+            formData.append(key, NewData[key]);
+        }
+        if (selectedFile) {
+            formData.append('image', selectedFile);
+        }
+        $axios.post(`/task/add`,{
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        .then((response)=>{
+            setTitle('')
+            setDescription('')
+            setEmployee('')
+            showSuccessToast()
+        })
+        .catch((error)=>{
+            console.log(error);
+            showErrorToast()
+        })
+    }
+    const postFoto = (event) =>{
+        setSelectedFile(event.target.files[0]);
+    }
+
     return (
         <div className='Project'>
             <div className='mt-[50px] overflow-hidden'>
                 <h1 className='text-[42px] font-[600] text-TitleColor font-montserrat'>
-                    “Akfa medline” sayti <span className='font-[500] text-[#83818E] text-[20px] font-montserrat'>/topshiriqlar</span>
+                    {ProjectName} <span className='font-[500] text-[#83818E] text-[20px] font-montserrat'>/topshiriqlar</span>
                 </h1>
                 <div className=' overflow-x-scroll pb-[50px]'>
                     <div className='flex  gap-[25px] mt-[50px] w-[300px]'>
@@ -118,12 +211,9 @@ function Project() {
                             <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]' >
                                 Boshlanish
                             </h2>
-                            <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
-                                <div className='relative cursor-pointer rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px] flex items-center justify-between mb-[25px]'>
-                                    <div onClick={MissionModal} className='flex items-center gap-[10px]'>
-                                        <div className=''>
-                                            <img className='w-[35px] h-[35px]' src={Programmer} alt="" />
-                                        </div>
+                            <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px] flex items-center justify-between flex-col'>
+                                <div className='relative w-full cursor-pointer rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px] flex items-center justify-between mb-[25px]'>
+                                    <div  className='flex items-center gap-[10px]'>
                                         <span className='Project__card__worker__title font-[500] text-[#83818E] text-[20px] font-montserrat'>
                                             dasturchi
                                         </span>
@@ -141,36 +231,12 @@ function Project() {
                                         </div>
                                     </div>
                                 </div>
-                                <div className='rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px]'>
-                                    <h3 className='font-montserrat text-[16px] text-[#0F0B24] font-[500]'>
-                                        Topshiriq nomi
-                                    </h3>
-                                    <div className='flex items-start flex-col gap-[px]'>
-                                        <span className='font-montserrat text-[16px] text-[#83818E] font-[500]'>
-                                            ta’rif
-                                        </span>
-                                        <span className='font-montserrat text-[16px] text-[#83818E] font-[500]'>
-                                            ta’rif
-                                        </span>
-                                    </div>
-                                    <div className='flex items-center gap-[7px] mt-[15px]'>
-                                        <button className='p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500'>
-                                            <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}><path d="M8 2v4m8-4v4"></path><rect width={18} height={18} x={3} y={4} rx={2}></rect><path d="M3 10h18"></path></g></svg>
-                                        </button>
-                                        <button onClick={AddPersonActive} className='p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500'>
-                                            <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M10.561 8.073a6 6 0 0 1 3.432 5.142a.75.75 0 1 1-1.498.07a4.5 4.5 0 0 0-8.99 0a.75.75 0 0 1-1.498-.07a6 6 0 0 1 3.431-5.142a3.999 3.999 0 1 1 5.123 0M10.5 5a2.5 2.5 0 1 0-5 0a2.5 2.5 0 0 0 5 0"></path></svg>
-                                        </button>
-                                        <button onClick={MessageActive} className='p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500'>
-                                            <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216m-80-32c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"></path></svg>
-                                        </button>
-                                    </div>
-                                    <button className='bg-btnColor flex items-center gap-[10px] w-full justify-center px-[16px] py-[8px] rounded-[16px] mt-[25px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
+                                    <button onClick={MissionModal} className='bg-btnColor flex items-center gap-[10px] w-full justify-center px-[16px] py-[8px] rounded-[16px] mt-[25px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
                                         <svg className='text-[25px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10s10-4.477 10-10S17.523 2 12 2m5 11h-4v4h-2v-4H7v-2h4V7h2v4h4z"></path></svg>
                                         <span className='font-montserrat text-[16px] text-[#1B1A28]'>
                                             qo’shish
                                         </span>
                                     </button>
-                                </div>
                             </div>
                         </div>
                         <div className='Project__card'>
@@ -178,39 +244,6 @@ function Project() {
                                 Jarayon
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
-                                <div className='cursor-pointer rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px] flex items-center justify-between mb-[25px]'>
-                                    <div onClick={MissionModal} className='flex items-center gap-[10px]'>
-                                        <div className=''>
-                                            <img className='w-[35px] h-[35px]' src={Design} alt="" />
-                                        </div>
-                                        <span className='Project__card__worker__title font-[500] text-[#83818E] text-[20px] font-montserrat'>
-                                            dasturchi
-                                        </span>
-                                    </div>
-                                    <button className='cursor-pointer' >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="5" height="19" viewBox="0 0 5 19" fill="none">
-                                            <circle cx="2.5" cy="2.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="9.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="16.5" r="2.5" fill="black" />
-                                        </svg>
-                                    </button>
-                                    <div onClick={DeleteModalActive} className={`smallModal absolute  py-[5px] pl-[10px] pr-[5px] right-[-50px] rounded-[10px] opacity-0 transition duration-300 ${isActiveSmallModal ? 'smallModalActive' : ''}`}>
-                                        <div className='bg-[#FEE2D6] p-[5px]  rounded-[8px]'>
-                                            <svg className='text-[25px] ' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M7 3h2a1 1 0 0 0-2 0M6 3a2 2 0 1 1 4 0h4a.5.5 0 0 1 0 1h-.564l-1.205 8.838A2.5 2.5 0 0 1 9.754 15H6.246a2.5 2.5 0 0 1-2.477-2.162L2.564 4H2a.5.5 0 0 1 0-1zm1 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0zM9.5 6a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5m-4.74 6.703A1.5 1.5 0 0 0 6.246 14h3.508a1.5 1.5 0 0 0 1.487-1.297L12.427 4H3.573z"></path></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className='flex items-center justify-center gap-[13px]'>
-                                    <div className='h-[1px] w-[50px] bg-black'>
-
-                                    </div>
-                                    <span className=''>
-                                        qo’shish
-                                    </span>
-                                    <div className='h-[1px] w-[50px] bg-black'>
-
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div className='Project__card'>
@@ -218,34 +251,6 @@ function Project() {
                                 Test
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
-                                <div className='cursor-pointer  rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px] flex items-center justify-between mb-[25px]'>
-                                    <div onClick={MissionModal} className='flex items-center gap-[10px]'>
-                                        <div className=''>
-                                            <img className='w-[35px] h-[35px]' src={Programmer} alt="" />
-                                        </div>
-                                        <span className='Project__card__worker__title font-[500] text-[#83818E] text-[20px] font-montserrat'>
-                                            dasturchi
-                                        </span>
-                                    </div>
-                                    <button className='cursor-pointer' >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="5" height="19" viewBox="0 0 5 19" fill="none">
-                                            <circle cx="2.5" cy="2.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="9.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="16.5" r="2.5" fill="black" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div className='flex items-center justify-center gap-[13px]'>
-                                    <div className='h-[1px] w-[50px] bg-black'>
-
-                                    </div>
-                                    <span className=''>
-                                        qo’shish
-                                    </span>
-                                    <div className='h-[1px] w-[50px] bg-black'>
-
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div className='Project__card'>
@@ -253,34 +258,6 @@ function Project() {
                                 Yakun
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
-                                <div className='cursor-pointer rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px] flex items-center justify-between mb-[25px]'>
-                                    <div onClick={MissionModal} className='flex items-center gap-[10px]'>
-                                        <div className=''>
-                                            <img className='w-[35px] h-[35px]' src={Programmer} alt="" />
-                                        </div>
-                                        <span className='Project__card__worker__title font-[500] text-[#83818E] text-[20px] font-montserrat'>
-                                            dasturchi
-                                        </span>
-                                    </div>
-                                    <button className='cursor-pointer' >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="5" height="19" viewBox="0 0 5 19" fill="none">
-                                            <circle cx="2.5" cy="2.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="9.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="16.5" r="2.5" fill="black" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <div className='flex items-center justify-center gap-[13px]'>
-                                    <div className='h-[1px] w-[50px] bg-black'>
-
-                                    </div>
-                                    <span className=''>
-                                        qo’shish
-                                    </span>
-                                    <div className='h-[1px] w-[50px] bg-black'>
-
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -308,10 +285,10 @@ function Project() {
                             <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M11.5 2h-.585A1.5 1.5 0 0 0 9.5 1h-3a1.5 1.5 0 0 0-1.415 1H4.5A1.5 1.5 0 0 0 3 3.5v10A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 11.5 2m-5 0h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1m.852 8.354l-1.5 1.5a.496.496 0 0 1-.706 0l-.5-.5a.5.5 0 0 1 .707-.707l.146.146l1.146-1.146a.5.5 0 0 1 .707.707m0-4l-1.5 1.5a.496.496 0 0 1-.706 0l-.5-.5a.5.5 0 0 1 .707-.707l.146.146l1.146-1.146a.5.5 0 0 1 .707.707M10.5 11H9a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 0 1m0-4H9a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 0 1"></path></svg>
                             <div>
                                 <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
-                                    Frontend kodlarini yozib tugatish
+                                Vazifa qo`shish
                                 </h2>
                                 <span className='text-[#83818E] text-[16px] font-[500] font-montserrat'>
-                                    boshlanish bo’limida
+                                    boshlanish bo’limiga
                                 </span>
                             </div>
                         </div>
@@ -338,10 +315,6 @@ function Project() {
                                             Saqlash
                                         </span>
                                     </button>
-                                    <button className='rounded-[16px] px-[16px] py-[8px] flex items-center gap-[8px] bg-transparent border-[2px] border-[#83818E] hover:text-[black] hover:bg-btnColor hover:border-btnColor transition duration-500 text-[#83818E]' >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 48 48"><path fill="currentColor" d="M20 10.5v.5h8v-.5a4 4 0 0 0-8 0m-2.5.5v-.5a6.5 6.5 0 1 1 13 0v.5h11.25a1.25 1.25 0 1 1 0 2.5h-2.917l-2 23.856A7.25 7.25 0 0 1 29.608 44H18.392a7.25 7.25 0 0 1-7.224-6.644l-2-23.856H6.25a1.25 1.25 0 1 1 0-2.5zm4 9.25a1.25 1.25 0 1 0-2.5 0v14.5a1.25 1.25 0 1 0 2.5 0zM27.75 19c-.69 0-1.25.56-1.25 1.25v14.5a1.25 1.25 0 1 0 2.5 0v-14.5c0-.69-.56-1.25-1.25-1.25"></path></svg>
-                                        o’chirish
-                                    </button>
                                 </div>
                                 <div className='flex items-center gap-[7px] mt-[15px]'>
                                     <div className='cursor-pointer p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500'>
@@ -349,9 +322,6 @@ function Project() {
                                     </div>
                                     <div onClick={() => toggleModal(1)} className={`${isOpen === 1 ? 'bg-btnColor' : ''} cursor-pointer p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500`}>
                                         <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M10.561 8.073a6 6 0 0 1 3.432 5.142a.75.75 0 1 1-1.498.07a4.5 4.5 0 0 0-8.99 0a.75.75 0 0 1-1.498-.07a6 6 0 0 1 3.431-5.142a3.999 3.999 0 1 1 5.123 0M10.5 5a2.5 2.5 0 1 0-5 0a2.5 2.5 0 0 0 5 0"></path></svg>
-                                    </div>
-                                    <div onClick={() => toggleModal(2)} className={`${isOpen === 2 ? 'bg-btnColor' : ''} cursor-pointer p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500`}>
-                                        <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M221.8 175.94c-5.55-9.56-13.8-36.61-13.8-71.94a80 80 0 1 0-160 0c0 35.34-8.26 62.38-13.81 71.94A16 16 0 0 0 48 200h40.81a40 40 0 0 0 78.38 0H208a16 16 0 0 0 13.8-24.06M128 216a24 24 0 0 1-22.62-16h45.24A24 24 0 0 1 128 216m-80-32c7.7-13.24 16-43.92 16-80a64 64 0 1 1 128 0c0 36.05 8.28 66.73 16 80Z"></path></svg>
                                     </div>
                                 </div>
                             </div>
@@ -370,28 +340,6 @@ function Project() {
                                 </button>
                             </form>
                         </div>
-                        <div className={` ${isOpen === 2 ? '  ' : 'hidden'} transition-max-height duration-500 ease-in-out overflow-hidden border-[1px] border-[#B6BEC3] rounded-[16px] p-[10px] mt-[30px] origin-top`}>
-                            <h1 className='font-montserrat text-[25px] text-[#1F1E30] font-[600] flex items-center gap-[12px] '>
-                                Xabar yuborish
-                                <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M9 2a4 4 0 1 0 0 8a4 4 0 0 0 0-8m-4.991 9A2 2 0 0 0 2 13c0 1.691.833 2.966 2.135 3.797C5.417 17.614 7.145 18 9 18q.617 0 1.21-.057A5.48 5.48 0 0 1 9 14.5c0-1.33.472-2.55 1.257-3.5zM14.5 19a4.5 4.5 0 1 0 0-9a4.5 4.5 0 0 0 0 9m0-7a.5.5 0 0 1 .5.5V14h1.5a.5.5 0 0 1 0 1H15v1.5a.5.5 0 0 1-1 0V15h-1.5a.5.5 0 0 1 0-1H14v-1.5a.5.5 0 0 1 .5-.5"></path></svg>
-                            </h1>
-                            <form className='block w-full   flex items-center justify-between gap-[15px]'>
-                                <label htmlFor="Team" className='w-full'>
-                                    <input placeholder='Jamoa nomi' type="text" id="Team" className='rounded-[16px] border-[0.5px] border-[#B6BEC3] p-[12px] w-full' />
-                                </label>
-                                <button className='p-[10px] border-[2px] border-[#83818E] rounded-[16px] hover:bg-[black] hover:text-[white] transition duration-500'>
-                                    qidirish
-                                </button>
-                            </form>
-                            <form className='mt-[20px]'>
-                                <label htmlFor="description">
-                                    <textarea placeholder='xabar yozing ' className='resize-none block w-full p-[10px] h-[100px] rounded-[10px] border-[0.5px] border-[#B6BEC3]' id="description"></textarea>
-                                </label>
-                                <button className='mt-[10px] w-full bg-btnColor p-[10px] border-[2px] border-btnColor rounded-[16px] hover:bg-transparent  transition duration-500'>
-                                    Yuborish
-                                </button>
-                            </form>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -403,7 +351,7 @@ function Project() {
                     </h1>
                     <form className='w-full mt-[12px] flex items-center gap-[10px]'>
                         <label htmlFor="" className='w-full rounded-[16px] block'>
-                            <input type="text" className='w-full rounded-[16px] block border-[0.5px] border-[#B6BEC3] p-[5px]' />
+                            <input placeholder='jamo nomi ' type="text" className='px-[10px] w-full rounded-[16px] block border-[0.5px] border-[#B6BEC3] p-[5px]' />
                         </label>
                         <button className='p-[10px] bg-btnColor rounded-[16px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
                             qidirish

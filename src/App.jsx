@@ -6,6 +6,9 @@ import MainLayout from "./layouts/MainLayout"
 import Payments from "./pages/Payments"
 import './pages/Media.css'
 import Project from "./pages/Project"
+import Workers from "./pages/Workers"
+import ProjectWorkers from "./pages/ProjectWorkers"
+import Profil from "./pages/Profil"
 
 function App() {
 
@@ -16,8 +19,11 @@ function App() {
           <Route element={<MainLayout />} >
             <Route index element={<Home />} />
             <Route path="/payments" element={<Payments />} />
-            <Route path="/project" element={<Project />} />
+            <Route path="/project/:ID" element={<Project />} />
             <Route path="employees" element={<EmployeeList />} />
+            <Route path="/workers" element={<Workers/>}/>
+            <Route path="/projectWorkers/:ID" element={<ProjectWorkers/>}/>
+            <Route path="/profil" element={<Profil/>}/>
           </Route>
         </Route>
       </Routes>
