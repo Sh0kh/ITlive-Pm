@@ -1,14 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react'
-import Programmer from '/images/PmProgrammer.svg'
-import Design from '/images/PmDesign.svg'
-import SearchEmpte from '/images/SearchEmpty.png'
+import React, { useState, useEffect, useRef } from 'react';
 import { $axios } from '../utils';
 import { useParams } from 'react-router-dom';
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { gql, useQuery } from '@apollo/client';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { gql, useQuery } from '@apollo/client';
-
 const GET_TASK = gql`
   query TaskCommon($ID: String!) {
     TaskCommon(ProjectId: $ID) {
@@ -17,113 +14,68 @@ const GET_TASK = gql`
         title
         description
         fileUrl
-        employeeProject {
-          id
-          employee {
-            id
-            name
-            surname
-            phoneNumber
-            role
-            avatarUrl
-          }
-        }
+        endAt
       }
     }
   }
 `;
+
+const GET__EMPLOYEE_ID = gql`
+query EmployeeProject($ID: String!){
+  EmployeeProject(ProjectId:$ID){
+	id
+    employee{
+      id
+      name
+      surname
+    }
+  }
+}
+`
+
 function Project() {
 
-    
-  const showSuccessToast = () => {
-    toast.success('Yaratildi!', {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
+    const showSuccessToast = () => {
+        toast.success('Qo`shildi!', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    };
 
 
-  const showErrorToast = () => {
-    toast.error('Xato!', {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
+    const showErrorToast = () => {
+        toast.error('Xato!', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+        });
+    };
 
-    const modalRef = useRef(null);
+
+
+
+    // MOdal
     const modalRef2 = useRef(null);
-    const modalRef3 = useRef(null);
-    const modalRef4 = useRef(null);
-    const [isActiveSmallModal, setActiveSmallModal] = useState(false)
-    const ActiveSmallModal = () => {
-        setActiveSmallModal(!isActiveSmallModal)
-    }
-    const [deleteModal, SetDeleteModal] = useState(false)
-    const DeleteModalActive = () => {
-        SetDeleteModal(!deleteModal)
-    }
-    const DeleteModal = () => {
-        ActiveSmallModal()
-        DeleteModalActive()
-    }
-
     const [IsMission, setMission] = useState(false)
     const MissionModal = () => {
         setMission(!IsMission)
     }
-    const [AddPerson, setAddPerson] = useState(false)
-    const AddPersonActive = () => {
-        setAddPerson(!AddPerson)
-    }
-    const [isMessage, setMessage] = useState(false)
-    const MessageActive = () => {
-        setMessage(!isMessage)
-    }
-
-    const handleClickOutside = (e) => {
-        if (modalRef.current && !modalRef.current.contains(e.target)) {
-            DeleteModal()
-        }
-    };
     const handleClickOutside2 = (e) => {
         if (modalRef2.current && !modalRef2.current.contains(e.target)) {
             setMission(false)
         }
     };
-    const handleClickOutside3 = (e) => {
-        if (modalRef3.current && !modalRef3.current.contains(e.target)) {
-            setAddPerson(false)
-        }
-    };
-    const handleClickOutside4 = (e) => {
-        if (modalRef4.current && !modalRef4.current.contains(e.target)) {
-            setMessage(false)
-        }
-    };
-
-    useEffect(() => {
-        if (deleteModal) {
-            document.addEventListener('mousedown', handleClickOutside);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [deleteModal,]);
-
     useEffect(() => {
         if (IsMission) {
             document.addEventListener('mousedown', handleClickOutside2);
@@ -134,8 +86,46 @@ function Project() {
             document.removeEventListener('mousedown', handleClickOutside2);
         };
     }, [IsMission]);
+    const [isOpen, setOpen] = useState(null)
+    const toggleModal = (e) => {
+        setOpen(isOpen === e ? null : e);
+    };
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const modalRef6 = useRef(null);
+
+    const openModal = () => {
+        setModalIsOpen(!modalIsOpen);
+    };
+
+    const handleClickOutside = (event) => {
+        if (modalRef6.current && !modalRef6.current.contains(event.target)) {
+            setModalIsOpen(false);
+        }
+    };
+
     useEffect(() => {
-        if (AddPerson) {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+
+
+
+    const [info, setInfo] = useState(false)
+    const InfoModal = () => {
+        setInfo(!info)
+    }
+    const infoRef = useRef(null);
+
+    const handleClickOutside3 = (e) => {
+        if (infoRef.current && !infoRef.current.contains(e.target)) {
+            setInfo(false)
+        }
+    };
+    useEffect(() => {
+        if (info) {
             document.addEventListener('mousedown', handleClickOutside3);
         } else {
             document.removeEventListener('mousedown', handleClickOutside3);
@@ -143,170 +133,147 @@ function Project() {
         return () => {
             document.removeEventListener('mousedown', handleClickOutside3);
         };
-    }, [AddPerson]);
-    useEffect(() => {
-        if (isMessage) {
-            document.addEventListener('mousedown', handleClickOutside4);
-        } else {
-            document.removeEventListener('mousedown', handleClickOutside4);
-        }
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside4);
-        };
-    }, [isMessage]);
+    }, [info]);
+    // modal 
+    const { ID } = useParams();
 
-    const [isOpen, setOpen] = useState(null)
-    const toggleModal = (e) => {
-        setOpen(isOpen === e ? null : e);
-    };
+    const [ProjectName, setProjectName] = useState([]);
+    const { data: EP } = useQuery(GET__EMPLOYEE_ID, {
+        variables: { ID },
+        skip: !ID
+    })
+    console.log(EP);
 
+    const { data: Task, refetch } = useQuery(GET_TASK, {
+        variables: { ID },
+        skip: !ID,
+    });
 
-
-    // Get project 
-    const {ID} = useParams()
-    const [ProjectName, setProjectName] = useState([])
-    const GetProject  = ()=>{
-        $axios.get(`/project/getById/${ID}`,{
+    const GetProject = () => {
+        $axios.get(`/project/getById/${ID}`, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
-              },
+            },
         })
-        .then((response)=>{
-            setProjectName(response.data)
-        })
-        .catch((error)=>{
-            console.log(error);
-        })
-    }
-    useEffect(()=>{
-        GetProject()
-    },[])
+            .then((response) => {
+                setProjectName(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    useEffect(() => {
+        GetProject();
+    }, []);
 
 
+
+
+    // Create Task 
 
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [employee, setEmployee] = useState('')
+    const [Sana, setSana] = useState('')
     const [selectedFile, setSelectedFile] = useState(null)
 
-    const CreateTask = ()=>{
+    const CreateTask = (e) => {
         e.preventDefault()
+        const formattedDate = Sana ? new Date(Sana).toISOString() : '';
+
         const NewData = {
-            title:title,
-            description:description,
-            employee:employee
+            title: title,
+            description: description,
+            employee_project_id: employee,
+            end_at: formattedDate,
         }
         const formData = new FormData();
         for (let key of Object.keys(NewData)) {
             formData.append(key, NewData[key]);
         }
         if (selectedFile) {
-            formData.append('image', selectedFile);
+            formData.append('file', selectedFile);
         }
-        $axios.post(`/task/add`,{
+        $axios.post(`/task/add`, formData, {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`,
                 'Content-Type': 'multipart/form-data',
             },
         })
-        .then((response)=>{
-            setTitle('')
-            setDescription('')
-            setEmployee('')
-            showSuccessToast()
-        })
-        .catch((error)=>{
-            console.log(error);
-            showErrorToast()
-        })
+            .then((response) => {
+                setTitle('')
+                setDescription('')
+                setEmployee('')
+                showSuccessToast()
+                MissionModal()
+                refetch()
+            })
+            .catch((error) => {
+                console.log(error);
+                showErrorToast()
+            })
     }
-    const postFoto = (event) =>{
+    const CreateFile = (event) => {
         setSelectedFile(event.target.files[0]);
     }
 
-    const { data: Task } = useQuery(GET_TASK, {
-        variables: { ID },
-        skip: !ID,
-      });
-      
-      console.log(Task);
 
+
+    const renderTaskTitles = (condition) => {
+        return Task?.TaskCommon?.filter(task => task.condition === condition)?.[0]?.tasks.map((task, index) => (
+            <div onClick={InfoModal} key={index} className='border-[2px] rounded-[16px] px-[10px] cursor-pointer w-full'>
+                <span className='font-montserrat font-[500] text-[18px] text-[#1B1A28]'>{task.title}</span>
+            </div>
+        ));
+    };
     return (
         <div className='Project'>
             <div className='mt-[50px] overflow-hidden'>
                 <h1 className='text-[42px] font-[600] text-TitleColor font-montserrat'>
                     {ProjectName} <span className='font-[500] text-[#83818E] text-[20px] font-montserrat'>/topshiriqlar</span>
                 </h1>
-                <div className=' overflow-x-scroll pb-[50px]'>
-                    <div className='flex  gap-[25px] mt-[50px] w-[300px]'>
-                        <div className='Project__card'>
-                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]' >
+                <div className='overflow-x-scroll pb-[50px]'>
+                    <div className='flex gap-[25px] mt-[50px] w-[900px]'>
+                        <div className='Project__card '>
+                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]'>
                                 Boshlanish
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px] flex items-center justify-between flex-col'>
-                                <div className='relative w-full cursor-pointer rounded-[8px] border-[0.5px] border-[#ABAAB9] px-[11px] py-[10px] flex items-center justify-between mb-[25px]'>
-                                    <div  className='flex items-center gap-[10px]'>
-                                        <span className='Project__card__worker__title font-[500] text-[#83818E] text-[20px] font-montserrat'>
-                                            dasturchi
-                                        </span>
-                                    </div>
-                                    <button onClick={ActiveSmallModal} className='cursor-pointer w-[50px] flex items-center justify-center' >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="5" height="19" viewBox="0 0 5 19" fill="none">
-                                            <circle cx="2.5" cy="2.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="9.5" r="2.5" fill="black" />
-                                            <circle cx="2.5" cy="16.5" r="2.5" fill="black" />
-                                        </svg>
-                                    </button>
-                                    <div onClick={DeleteModalActive} className={`smallModal absolute  py-[5px] pl-[10px] pr-[5px] right-[-50px] rounded-[10px] opacity-0 transition duration-300 ${isActiveSmallModal ? 'smallModalActive' : ''}`}>
-                                        <div className='bg-[#FEE2D6] p-[5px]  rounded-[8px]'>
-                                            <svg className='text-[25px] ' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M7 3h2a1 1 0 0 0-2 0M6 3a2 2 0 1 1 4 0h4a.5.5 0 0 1 0 1h-.564l-1.205 8.838A2.5 2.5 0 0 1 9.754 15H6.246a2.5 2.5 0 0 1-2.477-2.162L2.564 4H2a.5.5 0 0 1 0-1zm1 3.5a.5.5 0 0 0-1 0v5a.5.5 0 0 0 1 0zM9.5 6a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0v-5a.5.5 0 0 1 .5-.5m-4.74 6.703A1.5 1.5 0 0 0 6.246 14h3.508a1.5 1.5 0 0 0 1.487-1.297L12.427 4H3.573z"></path></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                    <button onClick={MissionModal} className='bg-btnColor flex items-center gap-[10px] w-full justify-center px-[16px] py-[8px] rounded-[16px] mt-[25px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
-                                        <svg className='text-[25px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10s10-4.477 10-10S17.523 2 12 2m5 11h-4v4h-2v-4H7v-2h4V7h2v4h4z"></path></svg>
-                                        <span className='font-montserrat text-[16px] text-[#1B1A28]'>
-                                            qo’shish
-                                        </span>
-                                    </button>
+                                {renderTaskTitles('BEGIN')}
+                                <div></div>
+                                <button onClick={MissionModal} className='bg-btnColor flex items-center gap-[10px] w-full justify-center px-[16px] py-[8px] rounded-[16px] mt-[25px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
+                                    <svg className='text-[25px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10s10-4.477 10-10S17.523 2 12 2m5 11h-4v4h-2v-4H7v-2h4V7h2v4h4z"></path></svg>
+                                    <span className='font-montserrat text-[16px] text-[#1B1A28]'>
+                                        qo’shish
+                                    </span>
+                                </button>
                             </div>
                         </div>
                         <div className='Project__card'>
-                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]' >
+                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]'>
                                 Jarayon
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
+                                {renderTaskTitles('PROCESS')}
                             </div>
                         </div>
                         <div className='Project__card'>
-                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]' >
+                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]'>
                                 Test
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
+                                {renderTaskTitles('TEST')}
                             </div>
                         </div>
                         <div className='Project__card'>
-                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]' >
+                            <h2 className='text-[#83818E] font-[600] font-montserrat text-[25px] mb-[25px]'>
                                 Yakun
                             </h2>
                             <div className='w-[302px] h-[340px] p-[15px] bg-white border-1 border-[#ABAAB9] rounded-[8px]'>
+                                {renderTaskTitles('CONFIRMED')}
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div className={`DeleteModal p-[5px] bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${deleteModal ? 'DeleteModalActive' : ''}`}>
-                <div ref={modalRef} className='Modal bg-customBg rounded-[16px] p-[30px] w-[360px]'>
-                    <h2 className='text-btnColor text-[26px] font-[600] text-center '>
-                        Xodim qo’shish
-                    </h2>
-                    <div className='flex items-center justify-center gap-[20px] mt-[20px]'>
-                        <button onClick={DeleteModal} className='text-black bg-btnColor px-[20px] py-[5px] rounded-[16px] border-2 border-btnColor hover:bg-transparent hover:text-white transition duration-500 '>
-                            Ha
-                        </button>
-                        <button onClick={DeleteModal} className='text-black bg-btnColor px-[20px] py-[5px] rounded-[16px] border-2 border-btnColor hover:bg-transparent hover:text-white transition duration-500 '>
-                            Yoq
-                        </button>
                     </div>
                 </div>
             </div>
@@ -317,11 +284,8 @@ function Project() {
                             <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M11.5 2h-.585A1.5 1.5 0 0 0 9.5 1h-3a1.5 1.5 0 0 0-1.415 1H4.5A1.5 1.5 0 0 0 3 3.5v10A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 11.5 2m-5 0h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1m.852 8.354l-1.5 1.5a.496.496 0 0 1-.706 0l-.5-.5a.5.5 0 0 1 .707-.707l.146.146l1.146-1.146a.5.5 0 0 1 .707.707m0-4l-1.5 1.5a.496.496 0 0 1-.706 0l-.5-.5a.5.5 0 0 1 .707-.707l.146.146l1.146-1.146a.5.5 0 0 1 .707.707M10.5 11H9a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 0 1m0-4H9a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 0 1"></path></svg>
                             <div>
                                 <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
-                                Vazifa qo`shish
+                                    Vazifa qo`shish
                                 </h2>
-                                <span className='text-[#83818E] text-[16px] font-[500] font-montserrat'>
-                                    boshlanish bo’limiga
-                                </span>
                             </div>
                         </div>
                         <button onClick={MissionModal}>
@@ -329,15 +293,27 @@ function Project() {
                         </button>
                     </div>
                     <div className='mt-[30px] mb-[15px]'>
+                        <label htmlFor="" className='mb-[10px] block'>
+                            <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
+                                Nom
+                            </h2>
+                            <input
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                type="text" className=' w-full p-[5px] rounded-[10px] border-[0.5px] border-[#B6BEC3]' />
+                        </label>
                         <div className='flex items-center gap-[6px]'>
                             <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M7.085 3A1.5 1.5 0 0 1 8.5 2h3a1.5 1.5 0 0 1 1.415 1H14.5A1.5 1.5 0 0 1 16 4.5v4.707A5.5 5.5 0 0 0 10.257 18H5.5A1.5 1.5 0 0 1 4 16.5v-12A1.5 1.5 0 0 1 5.5 3zM8.5 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm3.565 8.442a2 2 0 0 1-1.43 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.455 2.519l-.126.423q.387.306.835.517l.325-.344a2 2 0 0 1 2.909.002l.337.358q.44-.203.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.461-.118a4.7 4.7 0 0 0-.01-1.017l-.349-.082a2 2 0 0 1-1.456-2.52l.126-.421a4.3 4.3 0 0 0-.835-.519l-.324.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.822.497zM14.5 15.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2"></path></svg>
                             <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
                                 Ta’rif
                             </h2>
                         </div>
-                        <form className='block w-full mt-[15px]'>
+                        <form className='block w-full mt-[15px]' onSubmit={CreateTask}>
                             <label htmlFor="description">
-                                <textarea className='resize-none block w-full p-[10px] h-[100px] rounded-[10px] border-[0.5px] border-[#B6BEC3]' id="description"></textarea>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    className='resize-none block w-full p-[10px] h-[100px] rounded-[10px] border-[0.5px] border-[#B6BEC3]' id="description"></textarea>
                             </label>
                             <div className='Modal__wrapper flex items-center justify-between mt-[15px]'>
                                 <div className='flex items-center gap-[10px] '>
@@ -348,77 +324,115 @@ function Project() {
                                         </span>
                                     </button>
                                 </div>
-                                <div className='flex items-center gap-[7px] mt-[15px]'>
-                                    <div className='cursor-pointer p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500'>
+                                <div className='flex items-center gap-[7px] mt-[15px] relative'>
+                                    <div className={`absolute top-[-260px] right-[0px] hidden ${modalIsOpen ? 'klAc' : ''}`}
+                                        ref={modalRef6}>
+
+                                        <DatePicker
+                                            selected={Sana}
+                                            onChange={(date) => setSana(date)}// Убедитесь, что date передается в формате Date
+                                            inline
+                                        />
+                                    </div>
+                                    <div onClick={openModal} className='cursor-pointer p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500'>
                                         <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}><path d="M8 2v4m8-4v4"></path><rect width={18} height={18} x={3} y={4} rx={2}></rect><path d="M3 10h18"></path></g></svg>
                                     </div>
                                     <div onClick={() => toggleModal(1)} className={`${isOpen === 1 ? 'bg-btnColor' : ''} cursor-pointer p-[9px] border-[0.5px] border-[#ABAAB9] rounded-[8px] hover:bg-black hover:text-white transition duration-500`}>
                                         <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M10.561 8.073a6 6 0 0 1 3.432 5.142a.75.75 0 1 1-1.498.07a4.5 4.5 0 0 0-8.99 0a.75.75 0 0 1-1.498-.07a6 6 0 0 1 3.431-5.142a3.999 3.999 0 1 1 5.123 0M10.5 5a2.5 2.5 0 1 0-5 0a2.5 2.5 0 0 0 5 0"></path></svg>
                                     </div>
+                                    <div className="modal-foto">
+                                        <label className="file-input-container" htmlFor="editPhoto">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" fillRule="evenodd" d="M14 22h-4c-3.771 0-5.657 0-6.828-1.172S2 17.771 2 14v-4c0-3.771 0-5.657 1.172-6.828S6.239 2 10.03 2c.606 0 1.091 0 1.5.017q-.02.12-.02.244l-.01 2.834c0 1.097 0 2.067.105 2.848c.114.847.375 1.694 1.067 2.386c.69.69 1.538.952 2.385 1.066c.781.105 1.751.105 2.848.105h4.052c.043.534.043 1.19.043 2.063V14c0 3.771 0 5.657-1.172 6.828S17.771 22 14 22" clipRule="evenodd"></path><path fill="currentColor" d="m19.352 7.617l-3.96-3.563c-1.127-1.015-1.69-1.523-2.383-1.788L13 5c0 2.357 0 3.536.732 4.268S15.643 10 18 10h3.58c-.362-.704-1.012-1.288-2.228-2.383"></path></svg>
+                                            <input onChange={CreateFile} id="editPhoto" accept="image/*" type="file" />
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </form>
+
                         <div className={` ${isOpen === 1 ? '  ' : 'hidden'} transition-max-height duration-500 ease-in-out overflow-hidden border-[1px] border-[#B6BEC3] rounded-[16px] p-[30px] mt-[30px] origin-top`}>
                             <h1 className='font-montserrat text-[25px] text-[#1F1E30] font-[600] flex items-center gap-[12px] '>
-                                Jamoa biriktirish
+                                Xodim qo`shish
                                 <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M9 2a4 4 0 1 0 0 8a4 4 0 0 0 0-8m-4.991 9A2 2 0 0 0 2 13c0 1.691.833 2.966 2.135 3.797C5.417 17.614 7.145 18 9 18q.617 0 1.21-.057A5.48 5.48 0 0 1 9 14.5c0-1.33.472-2.55 1.257-3.5zM14.5 19a4.5 4.5 0 1 0 0-9a4.5 4.5 0 0 0 0 9m0-7a.5.5 0 0 1 .5.5V14h1.5a.5.5 0 0 1 0 1H15v1.5a.5.5 0 0 1-1 0V15h-1.5a.5.5 0 0 1 0-1H14v-1.5a.5.5 0 0 1 .5-.5"></path></svg>
                             </h1>
-                            <form className='block w-full   flex items-center justify-between gap-[15px]'>
-                                <label htmlFor="Team" className='w-full'>
-                                    <input placeholder='Jamoa nomi' type="text" id="Team" className='rounded-[16px] border-[0.5px] border-[#B6BEC3] p-[12px] w-full' />
-                                </label>
-                                <button className='p-[10px] border-[2px] border-[#83818E] rounded-[16px] hover:bg-[black] hover:text-[white] transition duration-500'>
-                                    qidirish
-                                </button>
+                            <form>
+                                <select
+                                    value={employee}
+                                    onChange={(e) => setEmployee(e.target.value)}
+                                    name="" id="" className='w-full p-[10px] rounded-[16px] border-[1px] border-[black] cursor-pointer'>
+                                    <option value="defaultValue" selected disabled>Xodimlar </option>
+                                    {EP?.EmployeeProject?.map((i) => (
+                                        <option key={i.id} value={i.id} >
+                                            {i.employee.name} {i.employee.surname}
+                                        </option>
+                                    ))}
+                                </select>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-            <div className={`DeleteModal p-[5px] bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${AddPerson ? 'DeleteModalActive' : ''}`}>
-                <div ref={modalRef3} className='Modal bg-white rounded-[16px] p-[30px] w-[40%]'>
-                    <h1 className='font-montserrat text-[25px] text-[#1F1E30] font-[600] flex items-center gap-[12px] '>
-                        Jamoa biriktirish
-                        <svg className='text-[30px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M9 2a4 4 0 1 0 0 8a4 4 0 0 0 0-8m-4.991 9A2 2 0 0 0 2 13c0 1.691.833 2.966 2.135 3.797C5.417 17.614 7.145 18 9 18q.617 0 1.21-.057A5.48 5.48 0 0 1 9 14.5c0-1.33.472-2.55 1.257-3.5zM14.5 19a4.5 4.5 0 1 0 0-9a4.5 4.5 0 0 0 0 9m0-7a.5.5 0 0 1 .5.5V14h1.5a.5.5 0 0 1 0 1H15v1.5a.5.5 0 0 1-1 0V15h-1.5a.5.5 0 0 1 0-1H14v-1.5a.5.5 0 0 1 .5-.5"></path></svg>
-                    </h1>
-                    <form className='w-full mt-[12px] flex items-center gap-[10px]'>
-                        <label htmlFor="" className='w-full rounded-[16px] block'>
-                            <input placeholder='jamo nomi ' type="text" className='px-[10px] w-full rounded-[16px] block border-[0.5px] border-[#B6BEC3] p-[5px]' />
-                        </label>
-                        <button className='p-[10px] bg-btnColor rounded-[16px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
-                            qidirish
+            <div className={`DeleteModal p-[5px]  bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${info ? 'DeleteModalActive' : ''}`}>
+                <div ref={infoRef} className='Modal  bg-white rounded-[16px] p-[30px] w-[60%] duration-500 ease-in-out overflow-hidden '>
+                    <div className='flex items-center justify-between'>
+                        <div className='flex items-start gap-[7px]'>
+                            <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="currentColor" d="M11.5 2h-.585A1.5 1.5 0 0 0 9.5 1h-3a1.5 1.5 0 0 0-1.415 1H4.5A1.5 1.5 0 0 0 3 3.5v10A1.5 1.5 0 0 0 4.5 15h7a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 11.5 2m-5 0h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1m.852 8.354l-1.5 1.5a.496.496 0 0 1-.706 0l-.5-.5a.5.5 0 0 1 .707-.707l.146.146l1.146-1.146a.5.5 0 0 1 .707.707m0-4l-1.5 1.5a.496.496 0 0 1-.706 0l-.5-.5a.5.5 0 0 1 .707-.707l.146.146l1.146-1.146a.5.5 0 0 1 .707.707M10.5 11H9a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 0 1m0-4H9a.5.5 0 0 1 0-1h1.5a.5.5 0 0 1 0 1"></path></svg>
+                            <div>
+                                <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
+                                    Vazifa qo`shish
+                                </h2>
+                            </div>
+                        </div>
+                        <button onClick={InfoModal}>
+                            <svg className='text-[#83818E] text-[25px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 14 14"><path fill="currentColor" fillRule="evenodd" d="M1.707.293A1 1 0 0 0 .293 1.707L5.586 7L.293 12.293a1 1 0 1 0 1.414 1.414L7 8.414l5.293 5.293a1 1 0 0 0 1.414-1.414L8.414 7l5.293-5.293A1 1 0 0 0 12.293.293L7 5.586z" clipRule="evenodd"></path></svg>
                         </button>
-                    </form>
-                    <div className='flex items-center justify-center'>
-                        <img src={SearchEmpte} alt="" />
+                    </div>
+                    <div className='mt-[30px] mb-[15px]'>
+                        <div>
+                            <div className='flex items-center gap-[6px]'>
+                                <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 20 20"><path fill="currentColor" d="M7.085 3A1.5 1.5 0 0 1 8.5 2h3a1.5 1.5 0 0 1 1.415 1H14.5A1.5 1.5 0 0 1 16 4.5v4.707A5.5 5.5 0 0 0 10.257 18H5.5A1.5 1.5 0 0 1 4 16.5v-12A1.5 1.5 0 0 1 5.5 3zM8.5 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm3.565 8.442a2 2 0 0 1-1.43 2.478l-.461.118a4.7 4.7 0 0 0 .01 1.016l.35.083a2 2 0 0 1 1.455 2.519l-.126.423q.387.306.835.517l.325-.344a2 2 0 0 1 2.909.002l.337.358q.44-.203.822-.498l-.156-.556a2 2 0 0 1 1.43-2.478l.461-.118a4.7 4.7 0 0 0-.01-1.017l-.349-.082a2 2 0 0 1-1.456-2.52l.126-.421a4.3 4.3 0 0 0-.835-.519l-.324.344a2 2 0 0 1-2.91-.001l-.337-.358a4.3 4.3 0 0 0-.822.497zM14.5 15.5a1 1 0 1 1 0-2a1 1 0 0 1 0 2"></path></svg>
+                                <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
+                                    Ta’rif
+                                </h2>
+                            </div>
+                            <div className='block w-full p-[10px]  rounded-[10px] border-[0.5px] border-[#B6BEC3]'>
+                                <p>
+
+                                </p>
+                            </div>
+                        </div>
+                        <div className='mt-[20px]'>
+                            <div className='flex items-center gap-[6px]'>
+                            <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4s-4 1.79-4 4s1.79 4 4 4m0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4"></path></svg>
+                                <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
+                                    Xodim
+                                </h2>
+                            </div>
+                            <div className='block w-full p-[10px]  rounded-[10px] border-[0.5px] border-[#B6BEC3]'>
+                               <span>
+                                
+                               </span>
+                            </div>
+                        </div>
+                        <div className='mt-[20px]'>
+                            <div className='flex items-center gap-[6px]'>
+                            <svg className='text-[28px]' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><g fill="none"><path d="m12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.018-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z"></path><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10s-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2m0 4a1 1 0 0 0-1 1v5a1 1 0 0 0 .293.707l3 3a1 1 0 0 0 1.414-1.414L13 11.586V7a1 1 0 0 0-1-1"></path></g></svg>
+                                <h2 className='font-montserrat text-[25px] text-[#1F1E30] font-[600]'>
+                                    Berilgan vaqt
+                                </h2>
+                            </div>
+                            <div className='block w-full p-[10px]  rounded-[10px] border-[0.5px] border-[#B6BEC3]'>
+                               <span>
+
+                               </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div className={`DeleteModal p-[5px] bg-[#d9d9d9bc] fixed inset-0 flex items-center justify-center ${isMessage ? 'DeleteModalActive' : ''}`}>
-                <div ref={modalRef4} className='Modal bg-white rounded-[16px] p-[30px] w-[40%]'>
-                    <h1 className='font-montserrat text-[25px] text-[#1F1E30] font-[600] flex items-center gap-[12px] '>
-                        Xabar yuborish
-                    </h1>
-                    <form className='w-full mt-[12px] flex items-center gap-[10px]'>
-                        <label htmlFor="" className='w-full rounded-[16px] block'>
-                            <input placeholder='emailni yozing' type="text" className='w-full rounded-[16px] block border-[0.5px] border-[#B6BEC3] px-[10px] p-[5px]' />
-                        </label>
-                        <button className='p-[10px] bg-btnColor rounded-[16px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
-                            qidirish
-                        </button>
-                    </form>
-                    <form>
-                        <label htmlFor="" className='mt-[15px] block'>
-                            <textarea placeholder='xabar yozing' name="" id="" className='resize-none block w-full p-[10px] h-[100px] rounded-[10px] border-[0.5px] border-[#B6BEC3]'></textarea>
-                        </label>
-                        <button className='p-[10px] w-full mt-[20px] bg-btnColor rounded-[16px] border-[2px] border-btnColor hover:bg-transparent transition duration-500'>
-                            yuborish
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <ToastContainer />
         </div>
-    )
+    );
 }
 
-export default Project
+export default Project;

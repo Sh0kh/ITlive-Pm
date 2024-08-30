@@ -163,3 +163,91 @@ input[type=number]::-webkit-outer-spin-button {
     color: white;
     cursor: pointer;
 }
+.klAc{
+    display: block !important;
+}
+/* custom-datepicker.css */
+
+.react-datepicker {
+    background-color: #000 !important; /* Черный фон */
+    color: #fff !important; /* Белый текст */
+    border: 1px solid #fff !important;
+  }
+  
+  .react-datepicker__header {
+    background-color: #000 !important; /* Черный фон заголовка */
+    border-bottom: 1px solid #fff !important;
+  }
+  
+  .react-datepicker__day,
+  .react-datepicker__day-name,
+  .react-datepicker__time-name {
+    color: #fff !important; /* Белый цвет текста */
+  }
+  
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected,
+  .react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box ul.react-datepicker__time-list li.react-datepicker__time-list-item--selected {
+    background-color: #ffffff !important; /* Темный серый для выбранного дня */
+    color: #000000 !important;
+  }
+  
+  .react-datepicker__current-month,
+  .react-datepicker-time__header,
+  .react-datepicker-year-header {
+    color: #fff !important; /* Белый текст заголовка месяца и года */
+  }
+  
+  .react-datepicker__day:hover {
+    background-color: #555 !important; /* Светло-серый при наведении */
+    color: #fff !important;
+  }
+  
+  .react-datepicker__triangle {
+    border-bottom-color: #000 !important; /* Черный цвет треугольника */
+  }
+  
+  .react-datepicker__close-icon::after {
+    background-color: #fff !important; /* Белый крестик для закрытия */
+    color: #000 !important;
+  }
+  .file-input-container {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    padding: 9px;
+    border: 1px solid #ABAAB9;
+    border-radius:8px;
+    cursor: pointer;
+    color: black;
+    background-color: transparent;
+    /* width: 80px; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-input-container input[type=file] {
+    cursor: pointer;
+    position: absolute;
+    font-size: 100px;
+    opacity: 0;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+}
+.file-input-container svg{
+  font-size: 30px;
+}
+.file-input-container span {
+    display: block;
+    text-align: center;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.file-input-container:hover {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}
