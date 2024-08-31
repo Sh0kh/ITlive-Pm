@@ -238,7 +238,7 @@ function Profil() {
           <div className=' mt-[20px]'>
             <form onSubmit={editFoto}>
               <div className="modal-foto">
-                <label className="file-input-container" htmlFor="photo">
+                <label className="file-input-container foto__profil" htmlFor="photo">
                   <span>Rasm</span>
                   <input id="photo" onChange={handleFileChange} accept="image/*" type="file" />
                 </label>
